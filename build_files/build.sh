@@ -54,3 +54,22 @@ sed -i 's@omit_drivers@force_drivers@g' /usr/lib/dracut/dracut.conf.d/99-nvidia.
 sed -i 's@ nvidia @ i915 amdgpu nvidia @g' /usr/lib/dracut/dracut.conf.d/99-nvidia.conf
 
 dracut --no-hostonly --kver "$KERNEL_VERSION" --reproducible --zstd -v --add ostree -f "/lib/modules/$KERNEL_VERSION/initramfs.img"
+
+sed -i 's|^ExecStart=.*|ExecStart=/usr/bin/bootc update --quiet|' /usr/lib/systemd/system/bootc-fetch-apply-updates.service
+systemctl enable bootc-fetch-apply-updates
+
+dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+dnf config-manager --set-disabled docker-ce-stable
+dnf -y install --enablerepo='docker-ce-stable' docker-ce docker-ce-cli docker-compose-plugin
+
+ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/bin/docker-compose
+mkdir -p /usr/lib/sysctl.d
+echo "net.ipv4.ip_forward = 1" >/usr/lib/sysctl.d/docker-ce.conf
+
+sed -i 's/enable docker/disable docker/' /usr/lib/systemd/system-preset/90-default.preset
+systemctl preset docker.service docker.socket
+
+cat >/usr/lib/sysusers.d/docker.conf <<'EOF'
+g docker -
+EOF
+
