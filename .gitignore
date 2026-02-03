@@ -1,5 +1,5 @@
-cosign.key
+cosign.*
 _build_*
 output
 _build-*/**
-cosign.pub
+
