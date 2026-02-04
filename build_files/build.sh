@@ -73,7 +73,7 @@ g docker -
 EOF
 
 #tailscale
-dnf config-manager --add-repo https://pkgs.tailscale.com/stable/centos/10/tailscale.rep
+dnf config-manager --add-repo https://pkgs.tailscale.com/stable/centos/10/tailscale.repo
 dnf -y  install tailscale
 
 systemctl enable tailscaled
