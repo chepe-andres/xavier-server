@@ -72,7 +72,18 @@ cat >/usr/lib/sysusers.d/docker.conf <<'EOF'
 g docker -
 EOF
 
-dnf install -y plymouth cockpit cockpit-storaged cockpit-ws cockpit-machines cockpit-selinux cockpit-files wget git firewalld msedit fastfetch btop
+#tailscale
+dnf config-manager --add-repo https://pkgs.tailscale.com/stable/centos/10/tailscale.rep
+dnf config-manager --set-disabled "tailscale-stable"
+# FIXME: tailscale EPEL10 request: https://bugzilla.redhat.com/show_bug.cgi?id=2349099
+dnf -y --enablerepo "tailscale-stable" install \
+	tailscale
+
+systemctl enable tailscaled
+
+
+
+dnf install -y plymouth cockpit cockpit-storaged cockpit-ws cockpit-machines cockpit-selinux cockpit-files cockpit-storaged wget git firewalld msedit fastfetch btop
 systemctl enable cockpit.socket
 
 
