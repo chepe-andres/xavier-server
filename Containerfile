@@ -3,8 +3,6 @@ FROM scratch AS ctx
 COPY build_files /
 
 # Pull prebuilt NVIDIA kmods from ublue
-FROM ghcr.io/ublue-os/akmods-nvidia-open:centos-10-x86_64 AS akmods
-
 # Base Image
 FROM quay.io/centos-bootc/centos-bootc:c10s
 
@@ -25,9 +23,6 @@ FROM quay.io/centos-bootc/centos-bootc:c10s
 ##
 ## Uncomment the following line if one desires to make /opt immutable and be able to be used
 ## by the package manager.
-
-# Copy prebuilt kmod RPMs into image
-COPY --from=akmods / /tmp/akmods-nvidia
 
 # RUN rm /opt && mkdir /opt
 
