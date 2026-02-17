@@ -34,6 +34,10 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/log \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build.sh
+
+RUN kver=$(cd /usr/lib/modules && echo *) && \
+        dkms autoinstall -k $kver && \
+        akmods --force --kernels $kver
     
 ### LINTING
 ## Verify final image and contents are correct.
