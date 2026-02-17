@@ -21,20 +21,26 @@ tee /etc/dkms/zstd.conf <<'EOF'
 POST_BUILD="zstd --rm -f $dkms_tree/$module/$module_version/build/*.ko"
 EOF
 
+# Enable Negativo17
 dnf config-manager --add-repo "https://negativo17.org/repos/epel-nvidia.repo"
+
+# Install the drivers 
 dnf install -y \
     nvidia-driver \
     nvidia-driver-cuda \
-    kmod-nvidia-open-dkms \
-    nvidia-container-toolkit \
+    nvidia-kmod-open-dkms \
     libnvidia-fbc \
     libnvidia-ml
 
-NVIDIA_VERSION=$(rpm -q --qf "%{VERSION}" kmod-nvidia-open-dkms)
+# Add the NVIDIA Container Toolkit repo
+dnf config-manager --add-repo https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo
+
+# Install the toolkit
+dnf install -y nvidia-container-toolkit
+
+NVIDIA_VERSION=$(rpm -q --qf "%{VERSION}" nvidia-kmod-open-dkms)
 dkms install -m nvidia -v "${NVIDIA_VERSION}" -k "${KERNEL_VERSION}"
 
-#dnf config-manager --add-repo https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo
-#dnf install -y nvidia-container-toolkit
 
 tee /usr/lib/modprobe.d/00-nouveau-blacklist.conf <<'EOF'
 blacklist nouveau
