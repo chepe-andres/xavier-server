@@ -28,8 +28,9 @@ dnf config-manager --add-repo "https://negativo17.org/repos/epel-nvidia.repo"
 dnf install -y \
     nvidia-driver \
     nvidia-driver-cuda \
-    nvidia-kmod-open-dkms \
+    dkms-nvidia \
     libnvidia-fbc \
+    nvidia-persistenced \
     libnvidia-ml
 
 # Add the NVIDIA Container Toolkit repo
