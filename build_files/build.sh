@@ -15,35 +15,26 @@ ZFS_VERSION="$(find /usr/src -maxdepth 1 -iname "zfs*" -exec basename '{}' ';' |
 dkms install -m zfs -v "${ZFS_VERSION}" -k "${KERNEL_VERSION}"
 cat /var/lib/dkms/*/*/build/make.log || :
 
-# old negativo drivers doesnt work for some reason
+# This forces DKMS to compress the compiled modules so the kernel can actually read them.
+mkdir -p /etc/dkms
+tee /etc/dkms/zstd.conf <<'EOF'
+POST_BUILD="zstd --rm -f $dkms_tree/$module/$module_version/build/*.ko"
+EOF
 
-# dnf config-manager --add-repo "https://negativo17.org/repos/epel-nvidia.repo"
-# dnf config-manager --set-disabled "epel-nvidia"
-# dnf config-manager --save --setopt=epel-nvidia.priority=90
-# dnf install -y --enablerepo="epel-nvidia" akmod-nvidia
-
-# dnf -y install gcc-c++
-# akmods --force --kernels "${KERNEL_VERSION}" --kmod "nvidia"
-# cat /var/cache/akmods/nvidia/*.failed.log || true
-
-# dnf config-manager --add-repo "https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo"
-# dnf config-manager --set-disabled "epel-nvidia"
-# dnf install -y --enablerepo="nvidia-container-toolkit" nvidia-container-toolkit
-
-# dnf install -y --enablerepo="epel-nvidia" --enablerepo="nvidia-container-toolkit" \
-
+dnf config-manager --add-repo "https://negativo17.org/repos/epel-nvidia.repo"
 dnf install -y \
-    /tmp/akmods-nvidia/rpms/ublue-os/ublue-os-akmods*.rpm \
-    /tmp/akmods-nvidia/rpms/kmods/kmod-nvidia-open*.rpm
+    nvidia-driver \
+    nvidia-driver-cuda \
+    kmod-nvidia-open-dkms \
+    nvidia-container-toolkit \
+    libnvidia-fbc \
+    libnvidia-ml
 
-dnf install -y \
-    "libnvidia-fbc" \
-    "libnvidia-ml" \
-    "nvidia-driver" \
-    "nvidia-driver-cuda" 
+NVIDIA_VERSION=$(rpm -q --qf "%{VERSION}" kmod-nvidia-open-dkms)
+dkms install -m nvidia -v "${NVIDIA_VERSION}" -k "${KERNEL_VERSION}"
 
-dnf config-manager --add-repo https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo
-dnf install -y nvidia-container-toolkit
+#dnf config-manager --add-repo https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo
+#dnf install -y nvidia-container-toolkit
 
 tee /usr/lib/modprobe.d/00-nouveau-blacklist.conf <<'EOF'
 blacklist nouveau
@@ -52,7 +43,7 @@ EOF
 
 echo zfs >/usr/lib/modules-load.d/zfs.conf
 echo nvidia >/usr/lib/modules-load.d/nvidia.conf
-
+echo nvidia-uvm >>/usr/lib/modules-load.d/nvidia.conf 
 
 tee /usr/lib/bootc/kargs.d/00-nvidia.toml <<'EOF'
 kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nvidia-drm.modeset=1"]
