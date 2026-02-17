@@ -3,7 +3,7 @@ FROM scratch AS ctx
 COPY build_files /
 
 # Pull prebuilt NVIDIA kmods from ublue
-FROM ghcr.io/ublue-os/akmods-nvidia-lts:centos-10 AS akmods
+ghcr.io/ublue-os/akmods-nvidia-open:centos-10-x86_64
 
 # Base Image
 FROM quay.io/centos-bootc/centos-bootc:c10s
