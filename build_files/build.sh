@@ -15,24 +15,35 @@ ZFS_VERSION="$(find /usr/src -maxdepth 1 -iname "zfs*" -exec basename '{}' ';' |
 dkms install -m zfs -v "${ZFS_VERSION}" -k "${KERNEL_VERSION}"
 cat /var/lib/dkms/*/*/build/make.log || :
 
-dnf config-manager --add-repo "https://negativo17.org/repos/epel-nvidia.repo"
-dnf config-manager --set-disabled "epel-nvidia"
-dnf config-manager --save --setopt=epel-nvidia.priority=90
-dnf install -y --enablerepo="epel-nvidia" akmod-nvidia
+# old negativo drivers doesnt work for some reason
 
-dnf -y install gcc-c++
-akmods --force --kernels "${KERNEL_VERSION}" --kmod "nvidia"
-cat /var/cache/akmods/nvidia/*.failed.log || true
+# dnf config-manager --add-repo "https://negativo17.org/repos/epel-nvidia.repo"
+# dnf config-manager --set-disabled "epel-nvidia"
+# dnf config-manager --save --setopt=epel-nvidia.priority=90
+# dnf install -y --enablerepo="epel-nvidia" akmod-nvidia
 
-dnf config-manager --add-repo "https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo"
-dnf config-manager --set-disabled "epel-nvidia"
-dnf install -y --enablerepo="nvidia-container-toolkit" nvidia-container-toolkit
+# dnf -y install gcc-c++
+# akmods --force --kernels "${KERNEL_VERSION}" --kmod "nvidia"
+# cat /var/cache/akmods/nvidia/*.failed.log || true
 
-dnf install -y --enablerepo="epel-nvidia" --enablerepo="nvidia-container-toolkit" \
+# dnf config-manager --add-repo "https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo"
+# dnf config-manager --set-disabled "epel-nvidia"
+# dnf install -y --enablerepo="nvidia-container-toolkit" nvidia-container-toolkit
+
+# dnf install -y --enablerepo="epel-nvidia" --enablerepo="nvidia-container-toolkit" \
+
+dnf install -y \
+    /tmp/akmods-nvidia/rpms/ublue-os/ublue-os-akmods*.rpm \
+    /tmp/akmods-nvidia/rpms/kmods/kmod-nvidia-open*.rpm
+
+dnf install -y \
     "libnvidia-fbc" \
     "libnvidia-ml" \
     "nvidia-driver" \
     "nvidia-driver-cuda" 
+
+dnf config-manager --add-repo https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo
+dnf install -y nvidia-container-toolkit
 
 tee /usr/lib/modprobe.d/00-nouveau-blacklist.conf <<'EOF'
 blacklist nouveau
