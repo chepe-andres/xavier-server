@@ -6,7 +6,7 @@ dnf update -y
 dnf install -y epel-release
 
 dnf install -y "https://zfsonlinux.org/epel/zfs-release-3-0$(rpm --eval "%{dist}").noarch.rpm"
-dnf install -y kernel-devel
+dnf install -y kernel-devel kernel-headers gcc make elfutils-libelf-devel zstd
 dnf install -y zfs
 
 KERNEL_VERSION="$(find "/usr/lib/modules" -maxdepth 1 -type d ! -path "/usr/lib/modules" -exec basename '{}' ';' | sort | grep -v kabi | tail -n 1)"
