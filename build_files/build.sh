@@ -39,9 +39,15 @@ dnf config-manager --add-repo https://nvidia.github.io/libnvidia-container/stabl
 # Install the toolkit
 dnf install -y nvidia-container-toolkit
 
-NVIDIA_VERSION=$(rpm -q --qf "%{VERSION}" nvidia-kmod-open-dkms)
-dkms install -m nvidia -v "${NVIDIA_VERSION}" -k "${KERNEL_VERSION}"
+# FIX: Changed package name to dkms-nvidia to match what was installed above
+NVIDIA_VERSION=$(rpm -q --qf "%{VERSION}" dkms-nvidia)
 
+# FIX: Added --config-options to force the "Open" driver build
+dkms install -m nvidia -v "${NVIDIA_VERSION}" -k "${KERNEL_VERSION}" --config-options "NV_KERNEL_MODULE_TYPE=open"
+
+# Manual compression fallback: ensures modules are compressed even if DKMS hooks fail in the container
+find "/lib/modules/${KERNEL_VERSION}/extra" -name "*.ko" -exec zstd --rm {} +
+depmod -a "${KERNEL_VERSION}"
 
 tee /usr/lib/modprobe.d/00-nouveau-blacklist.conf <<'EOF'
 blacklist nouveau
@@ -56,12 +62,15 @@ tee /usr/lib/bootc/kargs.d/00-nvidia.toml <<'EOF'
 kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nvidia-drm.modeset=1"]
 EOF
 
+# Ensure the directory exists before running sed
+mkdir -p /usr/lib/dracut/dracut.conf.d
+touch /usr/lib/dracut/dracut.conf.d/99-nvidia.conf
+
 # we must force driver load to fix black screen on boot for nvidia desktops
 sed -i 's@omit_drivers@force_drivers@g' /usr/lib/dracut/dracut.conf.d/99-nvidia.conf
 
-# as we need forced load, also mustpre-load intel/amd iGPU else chromium web browsers fail to use hardware acceleration
+# as we need forced load, also must pre-load intel/amd iGPU else chromium web browsers fail to use hardware acceleration
 sed -i 's@ nvidia @ i915 amdgpu nvidia @g' /usr/lib/dracut/dracut.conf.d/99-nvidia.conf
-
 
 sed -i 's|^ExecStart=.*|ExecStart=/usr/bin/bootc update --quiet|' /usr/lib/systemd/system/bootc-fetch-apply-updates.service
 systemctl enable bootc-fetch-apply-updates
