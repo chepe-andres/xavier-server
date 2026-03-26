@@ -14,6 +14,7 @@ ZFS_VERSION="$(find /usr/src -maxdepth 1 -iname "zfs*" -exec basename '{}' ';' |
 
 dkms install -m zfs -v "${ZFS_VERSION}" -k "${KERNEL_VERSION}"
 cat /var/lib/dkms/*/*/build/make.log || :
+cat /var/lib/dkms/zfs/*/build/*.log || true
 
 # This forces DKMS to compress the compiled modules so the kernel can actually read them.
 mkdir -p /etc/dkms
