@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -xeu
+#set -xeu
 # o pipefail
 
 dnf update -y
