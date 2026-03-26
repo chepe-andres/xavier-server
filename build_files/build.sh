@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -xeuo pipefail
+set -xeu
+# o pipefail
 
 dnf update -y
 dnf install -y epel-release
@@ -14,7 +15,6 @@ ZFS_VERSION="$(find /usr/src -maxdepth 1 -iname "zfs*" -exec basename '{}' ';' |
 
 dkms install -m zfs -v "${ZFS_VERSION}" -k "${KERNEL_VERSION}"
 cat /var/lib/dkms/*/*/build/make.log || :
-cat /var/lib/dkms/zfs/*/build/*.log || true
 
 # This forces DKMS to compress the compiled modules so the kernel can actually read them.
 mkdir -p /etc/dkms
@@ -108,7 +108,10 @@ systemctl enable cockpit.socket
 
 
 
+cat /var/lib/dkms/zfs/*/build/*.log || true
 
 
 
 dracut --no-hostonly --kver "$KERNEL_VERSION" --reproducible --zstd -v --add ostree -f "/lib/modules/$KERNEL_VERSION/initramfs.img"
+
+exit 1
