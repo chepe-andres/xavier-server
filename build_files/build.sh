@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-#set -xeu
-# o pipefail
+set -xeuo pipefail
 
 dnf update -y
 dnf install -y epel-release
 
 dnf install -y "https://zfsonlinux.org/epel/zfs-release-3-0$(rpm --eval "%{dist}").noarch.rpm"
-dnf install -y kernel-devel kernel-headers gcc make elfutils-libelf-devel zstd
+# FIXME: remove the version "-6.12.0-213.el10" after zfs starts compiling on this kernel again
+dnf install -y kernel{,-devel,-headers}-6.12.0-213.el10 gcc make elfutils-libelf-devel zstd
 dnf install -y zfs
 
 KERNEL_VERSION="$(find "/usr/lib/modules" -maxdepth 1 -type d ! -path "/usr/lib/modules" -exec basename '{}' ';' | sort | grep -v kabi | tail -n 1)"
@@ -102,16 +102,4 @@ systemctl enable tailscaled
 dnf install -y plymouth cockpit cockpit-storaged cockpit-ws cockpit-machines cockpit-selinux cockpit-files cockpit-storaged wget git firewalld msedit fastfetch btop
 systemctl enable cockpit.socket
 
-
-
-
-
-
-
-cat /var/lib/dkms/zfs/*/build/*.log || true
-
-
-
 dracut --no-hostonly --kver "$KERNEL_VERSION" --reproducible --zstd -v --add ostree -f "/lib/modules/$KERNEL_VERSION/initramfs.img"
-
-exit 1
