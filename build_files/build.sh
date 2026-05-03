@@ -7,7 +7,8 @@ dnf install -y epel-release
 
 dnf install -y "https://zfsonlinux.org/epel/zfs-release-3-0$(rpm --eval "%{dist}").noarch.rpm"
 # FIXME: remove the version "-6.12.0-213.el10" after zfs starts compiling on this kernel again
-dnf install -y kernel{,-devel,-headers}-6.12.0-213.el10 gcc make elfutils-libelf-devel zstd
+dnf install -y kernel{,-devel,-headers} gcc make elfutils-libelf-devel zstd
+
 dnf install -y zfs
 
 KERNEL_VERSION="$(find "/usr/lib/modules" -maxdepth 1 -type d ! -path "/usr/lib/modules" -exec basename '{}' ';' | sort | grep -v kabi | tail -n 1)"
