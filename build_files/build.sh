@@ -2,11 +2,21 @@
 
 set -xeuo pipefail
 
+# remove subscription manager slop
+dnf -y remove \
+    libdnf-plugin-subscription-manager \
+    python3-subscription-manager-rhsm \
+    subscription-manager \
+    subscription-manager-rhsm-certificates
+
 dnf update -y
 dnf install -y epel-release
 
+# Install zfs repo and enable the "zfs-latest" repo
 dnf install -y "https://zfsonlinux.org/epel/zfs-release-3-0$(rpm --eval "%{dist}").noarch.rpm"
-# FIXME: remove the version "-6.12.0-213.el10" after zfs starts compiling on this kernel again
+dnf config-manager --disable "zfs*"
+dnf config-manager --enable zfs-latest
+
 dnf install -y kernel{-devel,-headers} gcc make elfutils-libelf-devel zstd
 
 dnf install -y zfs
