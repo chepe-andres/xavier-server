@@ -4,7 +4,7 @@ COPY build_files /
 
 # Pull prebuilt NVIDIA kmods from ublue
 # Base Image
-FROM quay.io/centos-bootc/centos-bootc:c10s
+FROM quay.io/almalinuxorg/almalinux-bootc:10-kitten
 
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:latest

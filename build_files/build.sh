@@ -3,12 +3,6 @@
 set -xeuo pipefail
 
 # remove subscription manager slop
-dnf -y remove \
-    libdnf-plugin-subscription-manager \
-    python3-subscription-manager-rhsm \
-    subscription-manager \
-    subscription-manager-rhsm-certificates
-
 dnf update -y
 dnf install -y epel-release
 
@@ -107,8 +101,6 @@ dnf config-manager --add-repo https://pkgs.tailscale.com/stable/centos/10/tailsc
 dnf -y  install tailscale
 
 systemctl enable tailscaled
-
-
 
 dnf install -y rsync plymouth cockpit cockpit-storaged cockpit-ws cockpit-machines cockpit-selinux cockpit-files cockpit-storaged just fzf wget git firewalld msedit fastfetch btop
 systemctl enable cockpit.socket 
