@@ -102,7 +102,22 @@ dnf -y  install tailscale
 
 systemctl enable tailscaled
 
-dnf install -y rsync plymouth cockpit cockpit-storaged cockpit-ws cockpit-machines cockpit-selinux cockpit-files cockpit-storaged just fzf wget git firewalld helix virt-manager msedit fastfetch btop samba samba-common
+dnf install -y \
+rsync \
+plymouth \
+cockpit cockpit-storaged cockpit-ws cockpit-machines cockpit-selinux cockpit-files cockpit-storaged \
+just \
+fzf \
+wget \
+git \
+firewalld \
+helix \
+virt-manager \
+fastfetch \
+btop \
+samba samba-common
+
+
 systemctl enable cockpit.socket 
 
 dracut --no-hostonly --kver "$KERNEL_VERSION" --reproducible --zstd -v --add ostree -f "/lib/modules/$KERNEL_VERSION/initramfs.img"
