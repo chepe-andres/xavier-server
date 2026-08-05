@@ -106,7 +106,7 @@ dnf install -y \
 rsync \
 plymouth \
 cockpit cockpit-storaged cockpit-ws cockpit-machines cockpit-selinux cockpit-files cockpit-storaged \
-crontab \
+crontabs cronie \
 just \
 fzf \
 wget \
