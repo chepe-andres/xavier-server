@@ -118,6 +118,16 @@ fastfetch \
 btop \
 samba samba-common
 
+cat > /usr/lib/systemd/system-preset/01-xavier-server.preset <<EOF
+enable nvidia-cdi-refresh.path
+enable nvidia-cdi-refresh.service
+EOF
+
+mkdir -p /usr/lib/systemd/system/nvidia-persistenced.service.d
+cat > /usr/lib/systemd/system/nvidia-persistenced.service.d/after-udev.conf <<EOF
+[Unit]
+After=systemd-udevd.service
+EOF
 
 systemctl enable cockpit.socket 
 
