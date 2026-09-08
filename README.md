@@ -3,7 +3,7 @@
 
 
 
-My personal home server built on Centos-stream 10 and Bootc, includes ZFS, Nvidia drivers and other utilities I use for self-hosting! 
+My personal home server built on almalinux-kitten and Bootc, includes ZFS, Nvidia drivers and other utilities I use for self-hosting! 
 
 ** This is not meant for use outside of my own personal use, mileage may vary if you try to use it! **
 
